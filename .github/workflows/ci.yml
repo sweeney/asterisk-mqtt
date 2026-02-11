@@ -63,10 +63,10 @@ jobs:
           echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Test counts
-          PASSED=$(grep -c '"Action":"pass"' test-results.json 2>/dev/null || echo 0)
-          FAILED=$(grep -c '"Action":"fail"' test-results.json 2>/dev/null || echo 0)
-          SKIPPED=$(grep -c '"Action":"skip"' test-results.json 2>/dev/null || echo 0)
+          # Test counts (filter to test-level events only, exclude package-level)
+          PASSED=$(grep '"Test"' test-results.json 2>/dev/null | grep -c '"Action":"pass"' || echo 0)
+          FAILED=$(grep '"Test"' test-results.json 2>/dev/null | grep -c '"Action":"fail"' || echo 0)
+          SKIPPED=$(grep '"Test"' test-results.json 2>/dev/null | grep -c '"Action":"skip"' || echo 0)
 
           echo "| ✅ Passed | ❌ Failed | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
           echo "|:--------:|:--------:|:---------:|" >> $GITHUB_STEP_SUMMARY
