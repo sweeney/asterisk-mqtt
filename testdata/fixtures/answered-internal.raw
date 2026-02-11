@@ -1,0 +1,649 @@
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: 1986
+Priority: 1
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: <unknown>
+ConnectedLineName: Martin (Available)
+Language: en_GB
+AccountCode: 
+Context: macro-dial-one
+Exten: s
+Priority: 50
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin (Available)
+Language: en_GB
+AccountCode: 
+Context: macro-dial-one
+Exten: s
+Priority: 51
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 1986
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin (Available)
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+DestChannel: PJSIP/1986-0000001c
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 1986
+DestCallerIDName: Martin
+DestConnectedLineNum: 21
+DestConnectedLineName: Kitchen
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888534.44
+DestLinkedid: 1770888534.43
+DialString: 1986/sip:1986@10.0.0.1:51924;rinstance=fa771505d58758ad
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 1986
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+DestChannel: PJSIP/1986-0000001c
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 1986
+DestCallerIDName: Martin
+DestConnectedLineNum: 21
+DestConnectedLineName: Kitchen
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 1986
+DestPriority: 1
+DestUniqueid: 1770888534.44
+DestLinkedid: 1770888534.43
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 1986
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+DestChannel: PJSIP/1986-0000001c
+DestChannelState: 6
+DestChannelStateDesc: Up
+DestCallerIDNum: 1986
+DestCallerIDName: Martin
+DestConnectedLineNum: 21
+DestConnectedLineName: Kitchen
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 
+DestPriority: 1
+DestUniqueid: 1770888534.44
+DestLinkedid: 1770888534.43
+DialStatus: ANSWER
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: BridgeEnter
+Privilege: call,all
+BridgeUniqueid: 338ab658-f923-4a56-b1ae-ac35b3f2a76a
+BridgeType: basic
+BridgeTechnology: simple_bridge
+BridgeCreator: <unknown>
+BridgeName: <unknown>
+BridgeNumChannels: 1
+BridgeVideoSourceMode: none
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: BridgeEnter
+Privilege: call,all
+BridgeUniqueid: 338ab658-f923-4a56-b1ae-ac35b3f2a76a
+BridgeType: basic
+BridgeTechnology: simple_bridge
+BridgeCreator: <unknown>
+BridgeName: <unknown>
+BridgeNumChannels: 2
+BridgeVideoSourceMode: none
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+To: 10.0.0.1:18113
+From: 10.0.0.1:10973
+RTT: 0.0000
+MES: 88.1
+SSRC: 0xed381bdb
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888539.226270
+SentRTP: 3914620456
+SentPackets: 101
+SentOctets: 16160
+Report0SourceSSRC: 0x153b7ab4
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 14236
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 36
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+To: 10.0.0.1:19729
+From: 10.0.0.1:62273
+RTT: 0.0000
+MES: 88.1
+SSRC: 0x782ab9cc
+PT: 201(RR)
+ReportCount: 1
+Report0SourceSSRC: 0x782ab9cc
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 45353
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 0
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+To: 10.0.0.1:18113
+From: 10.0.0.1:10973
+RTT: 0.0000
+MES: 88.1
+SSRC: 0xed381bdd
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888541.266765
+SentRTP: 3914636616
+SentPackets: 202
+SentOctets: 32320
+Report0SourceSSRC: 0x153b7ab4
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 14339
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 49
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+To: 10.0.0.1:62273
+From: 10.0.0.1:19729
+MES: 88.1
+SSRC: 0x782ab9cc
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888542.212192
+SentRTP: 3914644296
+SentPackets: 250
+SentOctets: 40000
+Report0SourceSSRC: 0xe878d77c
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 27272
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 41
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+To: 10.0.0.1:10973
+From: 10.0.0.1:18113
+MES: 88.1
+SSRC: 0x153b7ab4
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888542.249595
+SentRTP: 85840072
+SentPackets: 241
+SentOctets: 38560
+Report0SourceSSRC: 0xce87ec86
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 251
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 6
+Report0LSR: 467485770
+Report0DLSR: 0.9890
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+To: 10.0.0.1:18113
+From: 10.0.0.1:10973
+RTT: 0.0103
+MES: 88.0
+SSRC: 0xed381bdf
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888543.806377
+SentRTP: 3914656936
+SentPackets: 329
+SentOctets: 52640
+Report0SourceSSRC: 0x153b7ab4
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 14466
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 37
+Report0LSR: 467550181
+Report0DLSR: 1.5398
+
+Event: HangupRequest
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+Cause: 16
+
+Event: BridgeLeave
+Privilege: call,all
+BridgeUniqueid: 338ab658-f923-4a56-b1ae-ac35b3f2a76a
+BridgeType: basic
+BridgeTechnology: simple_bridge
+BridgeCreator: <unknown>
+BridgeName: <unknown>
+BridgeNumChannels: 1
+BridgeVideoSourceMode: none
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+
+Event: SoftHangupRequest
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: dialOne-with-exten
+Exten: 1986
+Priority: 2
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+Cause: 16
+
+Event: BridgeLeave
+Privilege: call,all
+BridgeUniqueid: 338ab658-f923-4a56-b1ae-ac35b3f2a76a
+BridgeType: basic
+BridgeTechnology: simple_bridge
+BridgeCreator: <unknown>
+BridgeName: <unknown>
+BridgeNumChannels: 0
+BridgeVideoSourceMode: none
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/1986-0000001c
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: 21
+ConnectedLineName: Kitchen
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 
+Priority: 1
+Uniqueid: 1770888534.44
+Linkedid: 1770888534.43
+Cause: 16
+Cause-txt: Normal Clearing
+
+Event: UserEvent
+Privilege: user,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: macro-hangupcall
+Exten: s
+Priority: 3
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+UserEvent: MES
+RTPAUDIOQOSMESBRIDGED: 
+RTPAUDIOQOSMES: minrxmes=088.087887;   maxrxmes=088.087887;   avgrxmes=088.087887;   stdevrxmes=000.001040;   mintxmes=087.984495;   maxtxmes=088.087887;   avgtxmes=088.053423;   stdevtxmes=000.048740;
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/21-0000001b
+ChannelState: 6
+ChannelStateDesc: Up
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: macro-hangupcall
+Exten: s
+Priority: 7
+Uniqueid: 1770888534.43
+Linkedid: 1770888534.43
+Cause: 16
+Cause-txt: Normal Clearing
+

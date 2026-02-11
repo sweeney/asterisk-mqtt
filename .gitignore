@@ -1,0 +1,37 @@
+# Binaries
+/asterisk-mqtt
+/wiretap
+*.exe
+
+# Build output
+/bin/
+
+# Raw captures (sensitive AMI data)
+testdata/captures/*.raw
+!testdata/fixtures/*.raw
+
+# Sanitize backups
+*.bak
+
+# Test/build artifacts
+coverage.out
+coverage.html
+coverage.txt
+test-results.json
+tmp.out
+
+# Go
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config with secrets
+/asterisk-mqtt.yaml

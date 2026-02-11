@@ -1,0 +1,10 @@
+ami:
+  host: 127.0.0.1
+  port: 5038
+  username: admin
+  secret: changeme
+
+mqtt:
+  broker: tcp://localhost:1883
+  client_id: asterisk-mqtt
+  topic_prefix: asterisk

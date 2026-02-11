@@ -1,0 +1,1318 @@
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/11-00000020
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 11
+CallerIDName: Office
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.50
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/11-00000020
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 11
+CallerIDName: Office
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.50
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/12-00000021
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 12
+CallerIDName: Games Room
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.51
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/12-00000021
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 12
+CallerIDName: Games Room
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.51
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/21-00000022
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.52
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/21-00000022
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.52
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/41-00000023
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 41
+CallerIDName: Bea & Iris
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.53
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/41-00000023
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 41
+CallerIDName: Bea & Iris
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.53
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/42-00000024
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 42
+CallerIDName: Minnie
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.54
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/42-00000024
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 42
+CallerIDName: Minnie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.54
+Linkedid: 1770888635.49
+
+Event: Newchannel
+Privilege: call,all
+Channel: PJSIP/51-00000025
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 51
+CallerIDName: Alphie
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en
+AccountCode: 
+Context: from-internal
+Exten: s
+Priority: 1
+Uniqueid: 1770888635.55
+Linkedid: 1770888635.49
+
+Event: NewConnectedLine
+Privilege: call,all
+Channel: PJSIP/51-00000025
+ChannelState: 0
+ChannelStateDesc: Down
+CallerIDNum: 51
+CallerIDName: Alphie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.55
+Linkedid: 1770888635.49
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/11-00000020
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 11
+DestCallerIDName: Office
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.50
+DestLinkedid: 1770888635.49
+DialString: 11/sip:11@10.0.0.1:5060
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/12-00000021
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 12
+DestCallerIDName: Games Room
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.51
+DestLinkedid: 1770888635.49
+DialString: 12/sip:12@10.0.0.1:5060
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/21-00000022
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 21
+DestCallerIDName: Kitchen
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.52
+DestLinkedid: 1770888635.49
+DialString: 21/sip:21@10.0.0.1:5060
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/41-00000023
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 41
+DestCallerIDName: Bea & Iris
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.53
+DestLinkedid: 1770888635.49
+DialString: 41/sip:41@10.0.0.1:5060
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/42-00000024
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 42
+DestCallerIDName: Minnie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.54
+DestLinkedid: 1770888635.49
+DialString: 42/sip:42@10.0.0.1:5060
+
+Event: DialBegin
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/51-00000025
+DestChannelState: 0
+DestChannelStateDesc: Down
+DestCallerIDNum: 51
+DestCallerIDName: Alphie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: func-apply-sipheaders
+DestExten: s
+DestPriority: 16
+DestUniqueid: 1770888635.55
+DestLinkedid: 1770888635.49
+DialString: 51/sip:51@10.0.0.1:5060
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/11-00000020
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 11
+CallerIDName: Office
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.50
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/11-00000020
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 11
+DestCallerIDName: Office
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.50
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/12-00000021
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 12
+CallerIDName: Games Room
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.51
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/12-00000021
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 12
+DestCallerIDName: Games Room
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.51
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/21-00000022
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.52
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/21-00000022
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 21
+DestCallerIDName: Kitchen
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.52
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/41-00000023
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 41
+CallerIDName: Bea & Iris
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.53
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/41-00000023
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 41
+DestCallerIDName: Bea & Iris
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.53
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/42-00000024
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 42
+CallerIDName: Minnie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.54
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/42-00000024
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 42
+DestCallerIDName: Minnie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.54
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: Newstate
+Privilege: call,all
+Channel: PJSIP/51-00000025
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 51
+CallerIDName: Alphie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.55
+Linkedid: 1770888635.49
+
+Event: DialState
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/51-00000025
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 51
+DestCallerIDName: Alphie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.55
+DestLinkedid: 1770888635.49
+DialStatus: RINGING
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:11865
+From: 10.0.0.1:59145
+RTT: 0.0000
+MES: 88.1
+SSRC: 0x0fadda67
+PT: 201(RR)
+ReportCount: 1
+Report0SourceSSRC: 0x0fadda67
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 20666
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 0
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:59145
+From: 10.0.0.1:11865
+MES: 88.1
+SSRC: 0x0fadda67
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888640.599447
+SentRTP: 39840
+SentPackets: 249
+SentOctets: 39840
+Report0SourceSSRC: 0x715b5666
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 49633
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 43
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:11865
+From: 10.0.0.1:59145
+RTT: 0.0039
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 201(RR)
+ReportCount: 1
+Report0SourceSSRC: 0x0fadda67
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 20951
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 0
+Report0LSR: 473995637
+Report0DLSR: 3.0956
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:59145
+From: 10.0.0.1:11865
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888645.599903
+SentRTP: 79840
+SentPackets: 499
+SentOctets: 79840
+Report0SourceSSRC: 0x715b5666
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 49882
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 39
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:11865
+From: 10.0.0.1:59145
+RTT: 0.0038
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 201(RR)
+ReportCount: 1
+Report0SourceSSRC: 0x0fadda67
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 21233
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 4
+Report0LSR: 474323347
+Report0DLSR: 3.7386
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:59145
+From: 10.0.0.1:11865
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888650.600250
+SentRTP: 120000
+SentPackets: 750
+SentOctets: 120000
+Report0SourceSSRC: 0x715b5666
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 50133
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 43
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: RTCPReceived
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:11865
+From: 10.0.0.1:59145
+RTT: 0.0071
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 201(RR)
+ReportCount: 1
+Report0SourceSSRC: 0x0fadda67
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 21539
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 1
+Report0LSR: 474651049
+Report0DLSR: 4.8438
+
+Event: RTCPSent
+Privilege: reporting,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+To: 10.0.0.1:59145
+From: 10.0.0.1:11865
+MES: 88.0
+SSRC: 0x0fadda67
+PT: 200(SR)
+ReportCount: 1
+SentNTP: 1770888655.599527
+SentRTP: 159840
+SentPackets: 999
+SentOctets: 159840
+Report0SourceSSRC: 0x715b5666
+Report0FractionLost: 0
+Report0CumulativeLost: 0
+Report0HighestSequence: 50382
+Report0SequenceNumberCycles: 0
+Report0IAJitter: 39
+Report0LSR: 0
+Report0DLSR: 0.0000
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/11-00000020
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 11
+DestCallerIDName: Office
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.50
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/12-00000021
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 12
+DestCallerIDName: Games Room
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.51
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/21-00000022
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 21
+DestCallerIDName: Kitchen
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.52
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/41-00000023
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 41
+DestCallerIDName: Bea & Iris
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.53
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/42-00000024
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 42
+DestCallerIDName: Minnie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.54
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: DialEnd
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: dial-with-exten
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+DestChannel: PJSIP/51-00000025
+DestChannelState: 5
+DestChannelStateDesc: Ringing
+DestCallerIDNum: 51
+DestCallerIDName: Alphie
+DestConnectedLineNum: 1986
+DestConnectedLineName: Martin
+DestLanguage: en_GB
+DestAccountCode: 
+DestContext: from-internal
+DestExten: 666
+DestPriority: 1
+DestUniqueid: 1770888635.55
+DestLinkedid: 1770888635.49
+DialStatus: NOANSWER
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/11-00000020
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 11
+CallerIDName: Office
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.50
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/12-00000021
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 12
+CallerIDName: Games Room
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.51
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/21-00000022
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 21
+CallerIDName: Kitchen
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.52
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/41-00000023
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 41
+CallerIDName: Bea & Iris
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.53
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/42-00000024
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 42
+CallerIDName: Minnie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.54
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: SoftHangupRequest
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: app-blackhole
+Exten: hangup
+Priority: 2
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+Cause: 16
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/51-00000025
+ChannelState: 5
+ChannelStateDesc: Ringing
+CallerIDNum: 51
+CallerIDName: Alphie
+ConnectedLineNum: 1986
+ConnectedLineName: Martin
+Language: en_GB
+AccountCode: 
+Context: from-internal
+Exten: 666
+Priority: 1
+Uniqueid: 1770888635.55
+Linkedid: 1770888635.49
+Cause: 0
+Cause-txt: Unknown
+
+Event: Hangup
+Privilege: call,all
+Channel: PJSIP/1986-0000001f
+ChannelState: 4
+ChannelStateDesc: Ring
+CallerIDNum: 1986
+CallerIDName: Martin
+ConnectedLineNum: <unknown>
+ConnectedLineName: <unknown>
+Language: en_GB
+AccountCode: 
+Context: app-blackhole
+Exten: hangup
+Priority: 2
+Uniqueid: 1770888635.49
+Linkedid: 1770888635.49
+Cause: 16
+Cause-txt: Normal Clearing
+
