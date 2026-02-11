@@ -2,8 +2,6 @@ module github.com/sweeney/asterisk-mqtt
 
 go 1.24.0
 
-toolchain go1.25.0
-
 require (
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	gopkg.in/yaml.v3 v3.0.1
