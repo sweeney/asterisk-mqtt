@@ -55,7 +55,7 @@ make build-linux-arm     # ARM v6 (Pi Zero, etc.)
 
 ### Deploy
 
-Copy the binary to your Asterisk host and create a config file at `/etc/asterisk-mqtt/asterisk-mqtt.yaml`:
+Create a config file on the target host at `/etc/asterisk-mqtt/asterisk-mqtt.yaml`:
 
 ```yaml
 ami:
@@ -70,19 +70,13 @@ mqtt:
   topic_prefix: asterisk
 ```
 
-Install as a systemd service:
-
-```bash
-sudo deploy/install.sh /path/to/asterisk-mqtt /path/to/config.yaml
-```
-
-For subsequent updates, use the deploy script from the development machine:
+Then deploy from your development machine:
 
 ```bash
 ./deploy/deploy.sh user@asterisk-host
 ```
 
-This builds, copies, and restarts the service. First-time install vs update is detected automatically.
+This builds for linux/amd64, copies the binary and service file to the remote host, and runs the install script via sudo. First-time install vs update is detected automatically — if the service is already running it stops, updates, and restarts; otherwise it creates a service user, installs the systemd unit, and enables it.
 
 ## Configuration
 
@@ -177,8 +171,7 @@ testdata/
   fixtures/              Sanitized per-call fixtures (.raw + .json)
   captures/              Full session captures (gitignored)
 deploy/
-  deploy.sh              Build + ship + restart
-  remote-install.sh      First-install / update logic (runs on target)
+  deploy.sh              Build, ship, and install/update
   asterisk-mqtt.service  systemd unit
 ```
 

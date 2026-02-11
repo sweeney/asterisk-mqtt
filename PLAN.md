@@ -197,6 +197,7 @@ asterisk-mqtt/
       unanswered-huntgroup.raw
       unanswered-huntgroup.json
   deploy/
+    deploy.sh                    # build, ship, and install/update
     asterisk-mqtt.service        # systemd unit file
   .github/
     workflows/
