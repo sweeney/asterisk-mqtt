@@ -7,8 +7,9 @@ import (
 
 // Message records a single published message.
 type Message struct {
-	Topic   string
-	Payload []byte
+	Topic    string
+	Payload  []byte
+	Retained bool
 }
 
 // MockPublisher records all publishes for test assertions.
@@ -24,7 +25,15 @@ func NewMockPublisher() *MockPublisher {
 	return &MockPublisher{}
 }
 
-func (m *MockPublisher) Publish(_ context.Context, topic string, payload []byte) error {
+func (m *MockPublisher) Publish(ctx context.Context, topic string, payload []byte) error {
+	return m.record(topic, payload, false)
+}
+
+func (m *MockPublisher) PublishRetained(ctx context.Context, topic string, payload []byte) error {
+	return m.record(topic, payload, true)
+}
+
+func (m *MockPublisher) record(topic string, payload []byte, retained bool) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.err != nil {
@@ -32,7 +41,7 @@ func (m *MockPublisher) Publish(_ context.Context, topic string, payload []byte)
 	}
 	p := make([]byte, len(payload))
 	copy(p, payload)
-	m.messages = append(m.messages, Message{Topic: topic, Payload: p})
+	m.messages = append(m.messages, Message{Topic: topic, Payload: p, Retained: retained})
 	return nil
 }
 

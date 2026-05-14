@@ -69,6 +69,28 @@ func TestMockClose(t *testing.T) {
 	}
 }
 
+func TestMockPublishRetainedFlag(t *testing.T) {
+	m := NewMockPublisher()
+
+	if err := m.Publish(context.Background(), "events/a", []byte("e")); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := m.PublishRetained(context.Background(), "status", []byte("alive")); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	msgs := m.Messages()
+	if len(msgs) != 2 {
+		t.Fatalf("expected 2 messages, got %d", len(msgs))
+	}
+	if msgs[0].Retained {
+		t.Errorf("expected first message non-retained")
+	}
+	if !msgs[1].Retained {
+		t.Errorf("expected second message retained")
+	}
+}
+
 func TestMockSetError(t *testing.T) {
 	m := NewMockPublisher()
 	testErr := errors.New("broker down")

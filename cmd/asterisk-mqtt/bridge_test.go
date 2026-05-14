@@ -11,6 +11,7 @@ import (
 	"github.com/sweeney/asterisk-mqtt/internal/ami"
 	"github.com/sweeney/asterisk-mqtt/internal/correlator"
 	"github.com/sweeney/asterisk-mqtt/internal/publisher"
+	"github.com/sweeney/asterisk-mqtt/internal/stats"
 )
 
 func fixturesDir() string {
@@ -272,6 +273,78 @@ func TestPayloadCommonShape(t *testing.T) {
 		if !strings.HasSuffix(m.Topic, "/"+event) {
 			t.Errorf("message %d: event %q doesn't match topic %q", i, event, m.Topic)
 		}
+	}
+}
+
+// --- Heartbeat ---
+
+func TestPublishHeartbeatPayload(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	s := stats.New()
+	s.Record("ringing")
+	s.Record("answered")
+	s.Record("hungup")
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	msgs := mock.Messages()
+	if len(msgs) != 1 {
+		t.Fatalf("expected 1 message, got %d", len(msgs))
+	}
+	if msgs[0].Topic != "asterisk/status" {
+		t.Errorf("unexpected topic: %s", msgs[0].Topic)
+	}
+	if !msgs[0].Retained {
+		t.Errorf("heartbeat must be retained")
+	}
+
+	p := parsePayload(t, msgs[0].Payload)
+	if p["state"] != "online" {
+		t.Errorf("expected state=online, got %v", p["state"])
+	}
+	for _, key := range []string{"started_at", "uptime_seconds", "timestamp", "events"} {
+		if _, ok := p[key]; !ok {
+			t.Errorf("missing field %q in heartbeat payload", key)
+		}
+	}
+	events := p["events"].(map[string]any)
+	for _, key := range []string{"lifetime", "last_minute", "last_hour", "last_day"} {
+		if _, ok := events[key]; !ok {
+			t.Errorf("missing events.%s in heartbeat payload", key)
+		}
+	}
+	lifetime := events["lifetime"].(map[string]any)
+	if lifetime["ringing"].(float64) != 1 {
+		t.Errorf("expected lifetime.ringing=1, got %v", lifetime["ringing"])
+	}
+	if lifetime["hungup"].(float64) != 1 {
+		t.Errorf("expected lifetime.hungup=1, got %v", lifetime["hungup"])
+	}
+}
+
+func TestPublishHeartbeatEmpty(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	s := stats.New()
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	msgs := mock.Messages()
+	if len(msgs) != 1 {
+		t.Fatalf("expected 1 message, got %d", len(msgs))
+	}
+	p := parsePayload(t, msgs[0].Payload)
+	if p["state"] != "online" {
+		t.Errorf("expected state=online, got %v", p["state"])
+	}
+	// With no events recorded, counter maps should serialise as empty objects.
+	events := p["events"].(map[string]any)
+	lifetime := events["lifetime"].(map[string]any)
+	if len(lifetime) != 0 {
+		t.Errorf("expected empty lifetime map, got %v", lifetime)
 	}
 }
 

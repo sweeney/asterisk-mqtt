@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func writeConfig(t *testing.T, content string) string {
@@ -66,6 +67,50 @@ ami:
 	}
 	if cfg.MQTT.TopicPrefix != "asterisk" {
 		t.Errorf("expected default topic_prefix=asterisk, got %s", cfg.MQTT.TopicPrefix)
+	}
+	if cfg.Heartbeat.Interval.Duration() != 60*time.Second {
+		t.Errorf("expected default heartbeat interval=60s, got %s", cfg.Heartbeat.Interval)
+	}
+	if cfg.Heartbeat.Topic != "status" {
+		t.Errorf("expected default heartbeat topic=status, got %s", cfg.Heartbeat.Topic)
+	}
+}
+
+func TestLoadHeartbeatOverride(t *testing.T) {
+	path := writeConfig(t, `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: health
+`)
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Heartbeat.Interval.Duration() != 30*time.Second {
+		t.Errorf("expected heartbeat interval=30s, got %s", cfg.Heartbeat.Interval)
+	}
+	if cfg.Heartbeat.Topic != "health" {
+		t.Errorf("expected heartbeat topic=health, got %s", cfg.Heartbeat.Topic)
+	}
+}
+
+func TestLoadHeartbeatDisabled(t *testing.T) {
+	path := writeConfig(t, `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 0
+`)
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Heartbeat.Interval != 0 {
+		t.Errorf("expected heartbeat disabled (interval=0), got %s", cfg.Heartbeat.Interval)
 	}
 }
 
@@ -137,6 +182,21 @@ ami:
 mqtt:
   topic_prefix: ""
 `, "mqtt.topic_prefix is required"},
+		{"negative heartbeat interval", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: -5s
+`, "heartbeat.interval must not be negative, got -5s"},
+		{"heartbeat enabled but no topic", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: ""
+`, "heartbeat.topic is required when heartbeat.interval > 0"},
 	}
 
 	for _, tt := range tests {

@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	AMI  AMIConfig  `yaml:"ami"`
-	MQTT MQTTConfig `yaml:"mqtt"`
+	AMI       AMIConfig       `yaml:"ami"`
+	MQTT      MQTTConfig      `yaml:"mqtt"`
+	Heartbeat HeartbeatConfig `yaml:"heartbeat"`
 }
 
 type AMIConfig struct {
@@ -24,6 +26,42 @@ type MQTTConfig struct {
 	Broker      string `yaml:"broker"`
 	ClientID    string `yaml:"client_id"`
 	TopicPrefix string `yaml:"topic_prefix"`
+}
+
+// HeartbeatConfig controls periodic status/stats publishing.
+// An Interval of 0 disables the heartbeat entirely (no goroutine, no LWT).
+type HeartbeatConfig struct {
+	Interval Duration `yaml:"interval"`
+	Topic    string   `yaml:"topic"`
+}
+
+// Duration is a time.Duration that unmarshals from either a bare numeric value
+// (interpreted as nanoseconds, so use 0 to disable) or a Go-style duration
+// string like "30s" or "5m".
+type Duration time.Duration
+
+func (d Duration) String() string         { return time.Duration(d).String() }
+func (d Duration) Duration() time.Duration { return time.Duration(d) }
+
+func (d *Duration) UnmarshalYAML(value *yaml.Node) error {
+	switch value.Tag {
+	case "!!int":
+		var n int64
+		if err := value.Decode(&n); err != nil {
+			return err
+		}
+		*d = Duration(time.Duration(n))
+		return nil
+	case "!!str":
+		parsed, err := time.ParseDuration(value.Value)
+		if err != nil {
+			return fmt.Errorf("invalid duration %q: %w", value.Value, err)
+		}
+		*d = Duration(parsed)
+		return nil
+	default:
+		return fmt.Errorf("duration must be an integer or duration string, got %s", value.Tag)
+	}
 }
 
 func (c *AMIConfig) Addr() string {
@@ -45,6 +83,10 @@ func Load(path string) (*Config, error) {
 			Broker:      "tcp://localhost:1883",
 			ClientID:    "asterisk-mqtt",
 			TopicPrefix: "asterisk",
+		},
+		Heartbeat: HeartbeatConfig{
+			Interval: Duration(60 * time.Second),
+			Topic:    "status",
 		},
 	}
 
@@ -80,6 +122,12 @@ func (c *Config) validate() error {
 	}
 	if c.MQTT.TopicPrefix == "" {
 		return fmt.Errorf("mqtt.topic_prefix is required")
+	}
+	if c.Heartbeat.Interval < 0 {
+		return fmt.Errorf("heartbeat.interval must not be negative, got %s", c.Heartbeat.Interval)
+	}
+	if c.Heartbeat.Interval > 0 && c.Heartbeat.Topic == "" {
+		return fmt.Errorf("heartbeat.topic is required when heartbeat.interval > 0")
 	}
 	return nil
 }

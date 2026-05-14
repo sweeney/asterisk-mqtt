@@ -15,6 +15,7 @@ asterisk-mqtt watches the raw event stream, correlates events by call ID, and em
 | `{prefix}/call/{id}/ringing` | A call begins ringing |
 | `{prefix}/call/{id}/answered` | The call is picked up |
 | `{prefix}/call/{id}/hungup` | The call ends (for any reason) |
+| `{prefix}/status` | Retained heartbeat with rolling event counts (every 60s by default) |
 
 Every payload is self-describing JSON with plain-English descriptions, caller/callee identity, durations, and hangup cause translation:
 
@@ -68,6 +69,10 @@ mqtt:
   broker: tcp://localhost:1883
   client_id: asterisk-mqtt
   topic_prefix: asterisk
+
+heartbeat:
+  interval: 60s   # set to 0 to disable
+  topic: status
 ```
 
 Then deploy from your development machine:
@@ -91,6 +96,8 @@ All fields have sensible defaults. Only `ami.username` and `ami.secret` are requ
 | `mqtt.broker` | `tcp://localhost:1883` | MQTT broker URL |
 | `mqtt.client_id` | `asterisk-mqtt` | MQTT client identifier |
 | `mqtt.topic_prefix` | `asterisk` | Prefix for all MQTT topics |
+| `heartbeat.interval` | `60s` | Heartbeat publish interval. `0` disables the heartbeat and LWT entirely. |
+| `heartbeat.topic` | `status` | Topic appended to `topic_prefix` for the retained heartbeat / LWT |
 
 The daemon validates all config fields at startup and will refuse to start with an invalid configuration.
 
@@ -129,6 +136,31 @@ Published when the call ends for any reason. Adds:
 - `talk_duration_seconds` — time spent connected (0 if never answered)
 - `total_duration_seconds` — total time from first ring to hangup
 
+### `status` (heartbeat)
+
+Published to `{prefix}/status` (retained) on startup, then every `heartbeat.interval`, and also configured as the MQTT Last Will so the broker delivers an `"offline"` payload to subscribers if this daemon crashes or loses its connection.
+
+```json
+{
+  "state": "online",
+  "started_at": "2026-05-14T09:12:00Z",
+  "uptime_seconds": 86412.4,
+  "timestamp": "2026-05-15T09:12:12Z",
+  "events": {
+    "lifetime":    { "ringing": 412, "answered": 351, "hungup": 412 },
+    "last_minute": { "ringing": 1,   "answered": 1,   "hungup": 0   },
+    "last_hour":   { "ringing": 14,  "answered": 12,  "hungup": 14  },
+    "last_day":    { "ringing": 230, "answered": 198, "hungup": 230 }
+  }
+}
+```
+
+- `state` — `"online"` while the daemon is healthy; `"offline"` after clean shutdown or, via LWT, after an ungraceful disconnect.
+- `events.last_minute` / `last_hour` / `last_day` — rolling counts in 1-minute buckets; only the last 24 hours are retained.
+- `events.lifetime` — monotonic counts since process start.
+
+Because the message is retained, any consumer that subscribes after a long idle period will receive the most recent heartbeat immediately.
+
 ### Subscribing
 
 ```bash
@@ -140,6 +172,9 @@ mosquitto_sub -t 'asterisk/call/+/hungup' -v
 
 # Events for a specific call
 mosquitto_sub -t 'asterisk/call/1770888509.40/+' -v
+
+# Heartbeat / liveness (retained — fires immediately on subscribe)
+mosquitto_sub -t 'asterisk/status' -v
 ```
 
 ## Wiretap tool
@@ -167,6 +202,7 @@ internal/
   correlator/            Call state machine
   publisher/             MQTT publisher interface + mock
   config/                YAML config with validation
+  stats/                 Rolling event counters for the heartbeat payload
 testdata/
   fixtures/              Sanitized per-call fixtures (.raw + .json)
   captures/              Full session captures (gitignored)

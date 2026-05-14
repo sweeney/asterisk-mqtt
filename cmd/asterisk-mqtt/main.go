@@ -18,6 +18,7 @@ import (
 	"github.com/sweeney/asterisk-mqtt/internal/config"
 	"github.com/sweeney/asterisk-mqtt/internal/correlator"
 	"github.com/sweeney/asterisk-mqtt/internal/publisher"
+	"github.com/sweeney/asterisk-mqtt/internal/stats"
 )
 
 func main() {
@@ -41,11 +42,24 @@ func main() {
 		cancel()
 	}()
 
-	pub, err := publisher.NewMQTTPublisher(publisher.MQTTOptions{
+	mqttOpts := publisher.MQTTOptions{
 		Broker:   cfg.MQTT.Broker,
 		ClientID: cfg.MQTT.ClientID,
 		QoS:      1,
-	})
+	}
+
+	statusTopic := ""
+	if cfg.Heartbeat.Interval > 0 {
+		statusTopic = fmt.Sprintf("%s/%s", cfg.MQTT.TopicPrefix, cfg.Heartbeat.Topic)
+		willPayload, err := json.Marshal(statusPayload{State: "offline"})
+		if err != nil {
+			log.Fatalf("encoding will payload: %v", err)
+		}
+		mqttOpts.WillTopic = statusTopic
+		mqttOpts.WillPayload = willPayload
+	}
+
+	pub, err := publisher.NewMQTTPublisher(mqttOpts)
 	if err != nil {
 		log.Fatalf("connecting to MQTT: %v", err)
 	}
@@ -53,16 +67,40 @@ func main() {
 
 	log.Printf("connected to MQTT broker %s", cfg.MQTT.Broker)
 
-	if err := run(ctx, cfg, pub); err != nil && ctx.Err() == nil {
+	s := stats.New()
+
+	if statusTopic != "" {
+		// Publish an initial "online" status immediately so subscribers see
+		// state without waiting a full interval, and start the periodic loop.
+		if err := publishHeartbeat(ctx, pub, statusTopic, s); err != nil {
+			log.Printf("initial heartbeat publish error: %v", err)
+		}
+		go heartbeatLoop(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
+	}
+
+	if err := run(ctx, cfg, pub, s); err != nil && ctx.Err() == nil {
 		log.Fatalf("error: %v", err)
+	}
+
+	// Clean shutdown: replace the retained "online" payload with "offline"
+	// so subscribers don't see stale state after we exit. On crash, the
+	// broker delivers the LWT instead; either way the retained payload
+	// reflects reality.
+	if statusTopic != "" {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		payload, _ := json.Marshal(statusPayload{State: "offline"})
+		if err := pub.PublishRetained(shutdownCtx, statusTopic, payload); err != nil {
+			log.Printf("publishing offline status: %v", err)
+		}
 	}
 
 	log.Println("shutdown complete")
 }
 
-func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error {
+func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher, s *stats.Stats) error {
 	for {
-		err := runSession(ctx, cfg, pub)
+		err := runSession(ctx, cfg, pub, s)
 		if ctx.Err() != nil {
 			return nil
 		}
@@ -77,7 +115,7 @@ func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error
 	}
 }
 
-func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error {
+func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher, s *stats.Stats) error {
 	addr := cfg.AMI.Addr()
 	log.Printf("connecting to AMI at %s", addr)
 
@@ -125,6 +163,7 @@ func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher
 
 		changes := corr.Process(evt)
 		for _, change := range changes {
+			s.Record(string(change.State))
 			if err := publishChange(ctx, pub, cfg.MQTT.TopicPrefix, change); err != nil {
 				log.Printf("publish error: %v", err)
 			}
@@ -151,6 +190,24 @@ type mqttPayload struct {
 type endpoint struct {
 	Extension string `json:"extension"`
 	Name      string `json:"name,omitempty"`
+}
+
+// statusPayload is the JSON published to the heartbeat / status topic. The
+// `state` field is the LWT contract: "online" while the daemon is healthy,
+// "offline" when it has disconnected (cleanly or otherwise).
+type statusPayload struct {
+	State         string             `json:"state"`
+	StartedAt     string             `json:"started_at,omitempty"`
+	UptimeSeconds float64            `json:"uptime_seconds,omitempty"`
+	Timestamp     string             `json:"timestamp,omitempty"`
+	Events        *eventCountsBlock  `json:"events,omitempty"`
+}
+
+type eventCountsBlock struct {
+	Lifetime   map[string]uint64 `json:"lifetime"`
+	LastMinute map[string]uint64 `json:"last_minute"`
+	LastHour   map[string]uint64 `json:"last_hour"`
+	LastDay    map[string]uint64 `json:"last_day"`
 }
 
 var stateDescriptions = map[correlator.CallState]string{
@@ -195,4 +252,40 @@ func publishChange(ctx context.Context, pub publisher.Publisher, prefix string, 
 
 	log.Printf("publishing %s", topic)
 	return pub.Publish(ctx, topic, data)
+}
+
+func heartbeatLoop(ctx context.Context, pub publisher.Publisher, topic string, interval time.Duration, s *stats.Stats) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if err := publishHeartbeat(ctx, pub, topic, s); err != nil {
+				log.Printf("heartbeat publish error: %v", err)
+			}
+		}
+	}
+}
+
+func publishHeartbeat(ctx context.Context, pub publisher.Publisher, topic string, s *stats.Stats) error {
+	snap := s.Snapshot()
+	payload := statusPayload{
+		State:         "online",
+		StartedAt:     snap.StartedAt.UTC().Format(time.RFC3339),
+		UptimeSeconds: snap.UptimeSeconds,
+		Timestamp:     time.Now().UTC().Format(time.RFC3339),
+		Events: &eventCountsBlock{
+			Lifetime:   snap.Lifetime,
+			LastMinute: snap.LastMinute,
+			LastHour:   snap.LastHour,
+			LastDay:    snap.LastDay,
+		},
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("marshaling heartbeat: %w", err)
+	}
+	return pub.PublishRetained(ctx, topic, data)
 }
