@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/sweeney/asterisk-mqtt/internal/config"
 	"github.com/sweeney/asterisk-mqtt/internal/correlator"
 	"github.com/sweeney/asterisk-mqtt/internal/publisher"
+	"github.com/sweeney/asterisk-mqtt/internal/stats"
 )
 
 func main() {
@@ -41,11 +43,20 @@ func main() {
 		cancel()
 	}()
 
-	pub, err := publisher.NewMQTTPublisher(publisher.MQTTOptions{
+	mqttOpts := publisher.MQTTOptions{
 		Broker:   cfg.MQTT.Broker,
 		ClientID: cfg.MQTT.ClientID,
 		QoS:      1,
-	})
+	}
+
+	statusTopic := ""
+	if cfg.Heartbeat.Interval > 0 {
+		statusTopic = fmt.Sprintf("%s/%s", cfg.MQTT.TopicPrefix, cfg.Heartbeat.Topic)
+		mqttOpts.WillTopic = statusTopic
+		mqttOpts.WillPayload = offlineStatusBytes
+	}
+
+	pub, err := publisher.NewMQTTPublisher(mqttOpts)
 	if err != nil {
 		log.Fatalf("connecting to MQTT: %v", err)
 	}
@@ -53,16 +64,60 @@ func main() {
 
 	log.Printf("connected to MQTT broker %s", cfg.MQTT.Broker)
 
-	if err := run(ctx, cfg, pub); err != nil && ctx.Err() == nil {
+	s := stats.New()
+
+	var hbShutdown func()
+	if statusTopic != "" {
+		hbShutdown = startHeartbeat(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
+	}
+
+	if err := run(ctx, cfg, pub, s); err != nil && ctx.Err() == nil {
 		log.Fatalf("error: %v", err)
+	}
+
+	if hbShutdown != nil {
+		hbShutdown()
 	}
 
 	log.Println("shutdown complete")
 }
 
-func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error {
+// startHeartbeat publishes an initial "online" status, starts the periodic
+// loop, and returns a shutdown function. The shutdown waits for the goroutine
+// to drain (so no in-flight "online" can land after the final "offline") and
+// then publishes the retained "offline" payload itself.
+func startHeartbeat(ctx context.Context, pub publisher.Publisher, topic string, interval time.Duration, s *stats.Stats) func() {
+	if err := publishHeartbeat(ctx, pub, topic, s); err != nil {
+		log.Printf("initial heartbeat publish error: %v", err)
+	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		heartbeatLoop(ctx, pub, topic, interval, s)
+	}()
+	return func() {
+		// Wait for the heartbeat goroutine to fully drain. Paho preserves
+		// FIFO order on the wire, so once the goroutine has returned any
+		// next publish we queue is guaranteed to be last.
+		wg.Wait()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		if err := pub.PublishRetained(shutdownCtx, topic, offlineStatusBytes); err != nil {
+			log.Printf("publishing offline status: %v", err)
+		}
+	}
+}
+
+// offlineStatusBytes is the canonical retained payload published to the
+// status topic when the daemon stops cleanly, and the broker's LWT payload
+// when it stops abruptly. Kept as a package-level literal so tests can match
+// it byte-for-byte.
+var offlineStatusBytes = []byte(`{"state":"offline"}`)
+
+func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher, s *stats.Stats) error {
 	for {
-		err := runSession(ctx, cfg, pub)
+		err := runSession(ctx, cfg, pub, s)
 		if ctx.Err() != nil {
 			return nil
 		}
@@ -77,7 +132,7 @@ func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error
 	}
 }
 
-func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher) error {
+func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher, s *stats.Stats) error {
 	addr := cfg.AMI.Addr()
 	log.Printf("connecting to AMI at %s", addr)
 
@@ -125,6 +180,7 @@ func runSession(ctx context.Context, cfg *config.Config, pub publisher.Publisher
 
 		changes := corr.Process(evt)
 		for _, change := range changes {
+			s.Record(string(change.State))
 			if err := publishChange(ctx, pub, cfg.MQTT.TopicPrefix, change); err != nil {
 				log.Printf("publish error: %v", err)
 			}
@@ -151,6 +207,25 @@ type mqttPayload struct {
 type endpoint struct {
 	Extension string `json:"extension"`
 	Name      string `json:"name,omitempty"`
+}
+
+// heartbeatPayload is the JSON published to the status topic while the daemon
+// is healthy. The offline payload (LWT + clean-shutdown final) is a separate,
+// minimal `{"state":"offline"}` so we don't have to mark every field with
+// omitempty and pretend zero values are "missing".
+type heartbeatPayload struct {
+	State         string           `json:"state"`
+	StartedAt     string           `json:"started_at"`
+	UptimeSeconds float64          `json:"uptime_seconds"`
+	Timestamp     string           `json:"timestamp"`
+	Events        eventCountsBlock `json:"events"`
+}
+
+type eventCountsBlock struct {
+	Lifetime   map[string]uint64 `json:"lifetime"`
+	LastMinute map[string]uint64 `json:"last_minute"`
+	LastHour   map[string]uint64 `json:"last_hour"`
+	LastDay    map[string]uint64 `json:"last_day"`
 }
 
 var stateDescriptions = map[correlator.CallState]string{
@@ -195,4 +270,40 @@ func publishChange(ctx context.Context, pub publisher.Publisher, prefix string, 
 
 	log.Printf("publishing %s", topic)
 	return pub.Publish(ctx, topic, data)
+}
+
+func heartbeatLoop(ctx context.Context, pub publisher.Publisher, topic string, interval time.Duration, s *stats.Stats) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if err := publishHeartbeat(ctx, pub, topic, s); err != nil {
+				log.Printf("heartbeat publish error: %v", err)
+			}
+		}
+	}
+}
+
+func publishHeartbeat(ctx context.Context, pub publisher.Publisher, topic string, s *stats.Stats) error {
+	snap := s.Snapshot()
+	payload := heartbeatPayload{
+		State:         "online",
+		StartedAt:     snap.StartedAt.UTC().Format(time.RFC3339),
+		UptimeSeconds: snap.UptimeSeconds,
+		Timestamp:     snap.Now.UTC().Format(time.RFC3339),
+		Events: eventCountsBlock{
+			Lifetime:   snap.Lifetime,
+			LastMinute: snap.LastMinute,
+			LastHour:   snap.LastHour,
+			LastDay:    snap.LastDay,
+		},
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("marshaling heartbeat: %w", err)
+	}
+	return pub.PublishRetained(ctx, topic, data)
 }

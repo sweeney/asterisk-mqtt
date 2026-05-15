@@ -8,3 +8,10 @@ mqtt:
   broker: tcp://localhost:1883
   client_id: asterisk-mqtt
   topic_prefix: asterisk
+
+# Periodic retained status/stats message published to {topic_prefix}/{topic}.
+# Doubles as the MQTT Last Will so subscribers see "offline" if the daemon dies.
+# Set interval: 0 to disable.
+heartbeat:
+  interval: 60s
+  topic: status

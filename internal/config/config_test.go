@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func writeConfig(t *testing.T, content string) string {
@@ -66,6 +67,50 @@ ami:
 	}
 	if cfg.MQTT.TopicPrefix != "asterisk" {
 		t.Errorf("expected default topic_prefix=asterisk, got %s", cfg.MQTT.TopicPrefix)
+	}
+	if cfg.Heartbeat.Interval.Duration() != 60*time.Second {
+		t.Errorf("expected default heartbeat interval=60s, got %s", cfg.Heartbeat.Interval)
+	}
+	if cfg.Heartbeat.Topic != "status" {
+		t.Errorf("expected default heartbeat topic=status, got %s", cfg.Heartbeat.Topic)
+	}
+}
+
+func TestLoadHeartbeatOverride(t *testing.T) {
+	path := writeConfig(t, `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: health
+`)
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Heartbeat.Interval.Duration() != 30*time.Second {
+		t.Errorf("expected heartbeat interval=30s, got %s", cfg.Heartbeat.Interval)
+	}
+	if cfg.Heartbeat.Topic != "health" {
+		t.Errorf("expected heartbeat topic=health, got %s", cfg.Heartbeat.Topic)
+	}
+}
+
+func TestLoadHeartbeatDisabled(t *testing.T) {
+	path := writeConfig(t, `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 0
+`)
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Heartbeat.Interval != 0 {
+		t.Errorf("expected heartbeat disabled (interval=0), got %s", cfg.Heartbeat.Interval)
 	}
 }
 
@@ -137,6 +182,71 @@ ami:
 mqtt:
   topic_prefix: ""
 `, "mqtt.topic_prefix is required"},
+		{"negative heartbeat interval", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: -5s
+`, "heartbeat.interval must not be negative, got -5s"},
+		{"heartbeat enabled but no topic", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: ""
+`, "heartbeat.topic is required when heartbeat.interval > 0"},
+		{"bare positive integer interval is rejected", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 60
+`, `parsing config: duration must be 0 (to disable) or a duration string like "30s"; got bare integer 60 which would be interpreted as 60 nanoseconds`},
+		{"sub-second interval is rejected", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 500ms
+`, "heartbeat.interval must be at least 1s when non-zero, got 500ms"},
+		{"topic_prefix with wildcard", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk/#"
+`, `mqtt.topic_prefix must not contain MQTT wildcards (+ or #): "asterisk/#"`},
+		{"topic_prefix with reserved prefix", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "$SYS/foo"
+`, `mqtt.topic_prefix must not begin with '$' (reserved by MQTT brokers): "$SYS/foo"`},
+		{"topic_prefix with whitespace", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk pbx"
+`, `mqtt.topic_prefix must not contain whitespace or control characters: "asterisk pbx"`},
+		{"topic_prefix with trailing slash", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk/"
+`, `mqtt.topic_prefix must not have a leading or trailing '/': "asterisk/"`},
+		{"heartbeat.topic with wildcard", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: "status/+"
+`, `heartbeat.topic must not contain MQTT wildcards (+ or #): "status/+"`},
 	}
 
 	for _, tt := range tests {

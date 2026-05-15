@@ -7,11 +7,19 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sweeney/asterisk-mqtt/internal/ami"
 	"github.com/sweeney/asterisk-mqtt/internal/correlator"
 	"github.com/sweeney/asterisk-mqtt/internal/publisher"
+	"github.com/sweeney/asterisk-mqtt/internal/stats"
 )
+
+// fixedClock returns a stats.Clock pinned to t for deterministic uptime and
+// timestamp assertions in heartbeat tests.
+func fixedClock(t time.Time) stats.Clock {
+	return func() time.Time { return t }
+}
 
 func fixturesDir() string {
 	return filepath.Join("..", "..", "testdata", "fixtures")
@@ -272,6 +280,181 @@ func TestPayloadCommonShape(t *testing.T) {
 		if !strings.HasSuffix(m.Topic, "/"+event) {
 			t.Errorf("message %d: event %q doesn't match topic %q", i, event, m.Topic)
 		}
+	}
+}
+
+// --- Heartbeat ---
+
+func TestPublishHeartbeatPayload(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	clk := time.Date(2026, 5, 14, 12, 0, 0, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
+	s.Record("ringing")
+	s.Record("answered")
+	s.Record("hungup")
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	msgs := mock.Messages()
+	if len(msgs) != 1 {
+		t.Fatalf("expected 1 message, got %d", len(msgs))
+	}
+	if msgs[0].Topic != "asterisk/status" {
+		t.Errorf("unexpected topic: %s", msgs[0].Topic)
+	}
+	if !msgs[0].Retained {
+		t.Errorf("heartbeat must be retained")
+	}
+
+	p := parsePayload(t, msgs[0].Payload)
+	if p["state"] != "online" {
+		t.Errorf("expected state=online, got %v", p["state"])
+	}
+	for _, key := range []string{"started_at", "uptime_seconds", "timestamp", "events"} {
+		if _, ok := p[key]; !ok {
+			t.Errorf("missing field %q in heartbeat payload", key)
+		}
+	}
+	events := p["events"].(map[string]any)
+	for _, key := range []string{"lifetime", "last_minute", "last_hour", "last_day"} {
+		if _, ok := events[key]; !ok {
+			t.Errorf("missing events.%s in heartbeat payload", key)
+		}
+	}
+	lifetime := events["lifetime"].(map[string]any)
+	if lifetime["ringing"].(float64) != 1 {
+		t.Errorf("expected lifetime.ringing=1, got %v", lifetime["ringing"])
+	}
+	if lifetime["hungup"].(float64) != 1 {
+		t.Errorf("expected lifetime.hungup=1, got %v", lifetime["hungup"])
+	}
+}
+
+func TestPublishHeartbeatEmpty(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	clk := time.Date(2026, 5, 14, 12, 0, 0, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	msgs := mock.Messages()
+	if len(msgs) != 1 {
+		t.Fatalf("expected 1 message, got %d", len(msgs))
+	}
+	p := parsePayload(t, msgs[0].Payload)
+	if p["state"] != "online" {
+		t.Errorf("expected state=online, got %v", p["state"])
+	}
+	// With no events recorded, counter maps should serialise as empty objects.
+	events := p["events"].(map[string]any)
+	lifetime := events["lifetime"].(map[string]any)
+	if len(lifetime) != 0 {
+		t.Errorf("expected empty lifetime map, got %v", lifetime)
+	}
+}
+
+// TestPublishHeartbeatTimestampMatchesStatsClock pins down the fix for the
+// clock-mixing review comment: the wall clock in `timestamp` must come from
+// the same source as `uptime_seconds`, not a separate time.Now().
+func TestPublishHeartbeatTimestampMatchesStatsClock(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	clk := time.Date(2026, 5, 14, 12, 34, 56, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	p := parsePayload(t, mock.Messages()[0].Payload)
+	want := clk.Format(time.RFC3339)
+	if p["timestamp"] != want {
+		t.Errorf("expected timestamp=%q (from stats clock), got %v", want, p["timestamp"])
+	}
+}
+
+// TestStartHeartbeatShutdownOrdering verifies the full lifecycle: an initial
+// "online" goes out immediately, ticks add more "online" messages, and after
+// ctx is cancelled the shutdown function publishes exactly one trailing
+// retained "offline" — guaranteed last by the WaitGroup drain.
+func TestStartHeartbeatShutdownOrdering(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	s := stats.New()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Short ticker so we definitely see at least one mid-loop publish before
+	// shutdown, but well above the 1s config minimum (that minimum guards
+	// operator typos, not test-only behaviour).
+	shutdown := startHeartbeat(ctx, mock, "asterisk/status", 5*time.Millisecond, s)
+
+	time.Sleep(30 * time.Millisecond)
+	cancel()
+	shutdown()
+
+	msgs := mock.Messages()
+	if len(msgs) < 2 {
+		t.Fatalf("expected at least 2 messages (initial online + final offline), got %d", len(msgs))
+	}
+
+	// Every message except the last is an "online" heartbeat to the right
+	// topic, retained.
+	for i, m := range msgs[:len(msgs)-1] {
+		if m.Topic != "asterisk/status" {
+			t.Errorf("msg %d: wrong topic %q", i, m.Topic)
+		}
+		if !m.Retained {
+			t.Errorf("msg %d: must be retained", i)
+		}
+		p := parsePayload(t, m.Payload)
+		if p["state"] != "online" {
+			t.Errorf("msg %d: expected state=online, got %v", i, p["state"])
+		}
+	}
+
+	last := msgs[len(msgs)-1]
+	if last.Topic != "asterisk/status" {
+		t.Errorf("final message topic %q != asterisk/status", last.Topic)
+	}
+	if !last.Retained {
+		t.Errorf("final offline message must be retained")
+	}
+	if string(last.Payload) != `{"state":"offline"}` {
+		t.Errorf("final payload %q != %q", last.Payload, `{"state":"offline"}`)
+	}
+}
+
+// TestOfflineStatusBytesUsedAsLWT pins the package-level offline literal so
+// the LWT wired into MQTTOptions matches the clean-shutdown publish byte for
+// byte. (A drift between the two would mean a subscriber distinguishing
+// crash vs. clean exit by payload would silently break.)
+func TestOfflineStatusBytesUsedAsLWT(t *testing.T) {
+	if string(offlineStatusBytes) != `{"state":"offline"}` {
+		t.Errorf("offlineStatusBytes drifted: %s", offlineStatusBytes)
+	}
+}
+
+// Regression: uptime_seconds must always be present in the heartbeat payload,
+// even when its value is zero. omitempty would silently drop the field — see
+// https://github.com/sweeney/asterisk-mqtt/pull/2#discussion_r3246602779
+func TestHeartbeatUptimeZeroIsEmitted(t *testing.T) {
+	// Marshal the payload directly with a zero UptimeSeconds and assert the
+	// key is in the raw JSON, not just present at decode time.
+	payload := heartbeatPayload{State: "online"}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(data), `"uptime_seconds":0`) {
+		t.Errorf("expected uptime_seconds:0 in payload, got %s", data)
+	}
+	if !strings.Contains(string(data), `"started_at":""`) {
+		t.Errorf("expected started_at to be present (even as empty string), got %s", data)
+	}
+	if !strings.Contains(string(data), `"timestamp":""`) {
+		t.Errorf("expected timestamp to be present (even as empty string), got %s", data)
 	}
 }
 
