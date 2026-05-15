@@ -55,16 +55,26 @@ func NewMQTTPublisher(opts MQTTOptions) (*MQTTPublisher, error) {
 	}, nil
 }
 
-func (p *MQTTPublisher) Publish(_ context.Context, topic string, payload []byte) error {
-	token := p.client.Publish(topic, p.qos, false, payload)
-	token.Wait()
-	return token.Error()
+func (p *MQTTPublisher) Publish(ctx context.Context, topic string, payload []byte) error {
+	return p.publish(ctx, topic, payload, false)
 }
 
-func (p *MQTTPublisher) PublishRetained(_ context.Context, topic string, payload []byte) error {
-	token := p.client.Publish(topic, p.qos, true, payload)
-	token.Wait()
-	return token.Error()
+func (p *MQTTPublisher) PublishRetained(ctx context.Context, topic string, payload []byte) error {
+	return p.publish(ctx, topic, payload, true)
+}
+
+// publish waits for either delivery confirmation or ctx cancellation. The
+// underlying Paho client keeps the message queued for delivery even when ctx
+// fires first, so callers cannot rely on cancellation actually preventing
+// transmission — only on not blocking forever.
+func (p *MQTTPublisher) publish(ctx context.Context, topic string, payload []byte, retained bool) error {
+	token := p.client.Publish(topic, p.qos, retained, payload)
+	select {
+	case <-token.Done():
+		return token.Error()
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 func (p *MQTTPublisher) Close() error {

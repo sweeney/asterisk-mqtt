@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -49,14 +50,11 @@ func main() {
 	}
 
 	statusTopic := ""
+	offlineBytes := []byte(`{"state":"offline"}`)
 	if cfg.Heartbeat.Interval > 0 {
 		statusTopic = fmt.Sprintf("%s/%s", cfg.MQTT.TopicPrefix, cfg.Heartbeat.Topic)
-		willPayload, err := json.Marshal(statusPayload{State: "offline"})
-		if err != nil {
-			log.Fatalf("encoding will payload: %v", err)
-		}
 		mqttOpts.WillTopic = statusTopic
-		mqttOpts.WillPayload = willPayload
+		mqttOpts.WillPayload = offlineBytes
 	}
 
 	pub, err := publisher.NewMQTTPublisher(mqttOpts)
@@ -69,18 +67,29 @@ func main() {
 
 	s := stats.New()
 
+	var hbWg sync.WaitGroup
 	if statusTopic != "" {
 		// Publish an initial "online" status immediately so subscribers see
 		// state without waiting a full interval, and start the periodic loop.
 		if err := publishHeartbeat(ctx, pub, statusTopic, s); err != nil {
 			log.Printf("initial heartbeat publish error: %v", err)
 		}
-		go heartbeatLoop(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
+		hbWg.Add(1)
+		go func() {
+			defer hbWg.Done()
+			heartbeatLoop(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
+		}()
 	}
 
 	if err := run(ctx, cfg, pub, s); err != nil && ctx.Err() == nil {
 		log.Fatalf("error: %v", err)
 	}
+
+	// Wait for the heartbeat goroutine to fully drain so its in-flight
+	// "online" publish cannot land after the final "offline" we publish
+	// below. Paho preserves FIFO order on the wire, so once the goroutine
+	// has returned, any next publish we queue is guaranteed to be last.
+	hbWg.Wait()
 
 	// Clean shutdown: replace the retained "online" payload with "offline"
 	// so subscribers don't see stale state after we exit. On crash, the
@@ -89,8 +98,7 @@ func main() {
 	if statusTopic != "" {
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-		payload, _ := json.Marshal(statusPayload{State: "offline"})
-		if err := pub.PublishRetained(shutdownCtx, statusTopic, payload); err != nil {
+		if err := pub.PublishRetained(shutdownCtx, statusTopic, offlineBytes); err != nil {
 			log.Printf("publishing offline status: %v", err)
 		}
 	}
@@ -192,15 +200,16 @@ type endpoint struct {
 	Name      string `json:"name,omitempty"`
 }
 
-// statusPayload is the JSON published to the heartbeat / status topic. The
-// `state` field is the LWT contract: "online" while the daemon is healthy,
-// "offline" when it has disconnected (cleanly or otherwise).
-type statusPayload struct {
-	State         string             `json:"state"`
-	StartedAt     string             `json:"started_at,omitempty"`
-	UptimeSeconds float64            `json:"uptime_seconds,omitempty"`
-	Timestamp     string             `json:"timestamp,omitempty"`
-	Events        *eventCountsBlock  `json:"events,omitempty"`
+// heartbeatPayload is the JSON published to the status topic while the daemon
+// is healthy. The offline payload (LWT + clean-shutdown final) is a separate,
+// minimal `{"state":"offline"}` so we don't have to mark every field with
+// omitempty and pretend zero values are "missing".
+type heartbeatPayload struct {
+	State         string           `json:"state"`
+	StartedAt     string           `json:"started_at"`
+	UptimeSeconds float64          `json:"uptime_seconds"`
+	Timestamp     string           `json:"timestamp"`
+	Events        eventCountsBlock `json:"events"`
 }
 
 type eventCountsBlock struct {
@@ -271,12 +280,12 @@ func heartbeatLoop(ctx context.Context, pub publisher.Publisher, topic string, i
 
 func publishHeartbeat(ctx context.Context, pub publisher.Publisher, topic string, s *stats.Stats) error {
 	snap := s.Snapshot()
-	payload := statusPayload{
+	payload := heartbeatPayload{
 		State:         "online",
 		StartedAt:     snap.StartedAt.UTC().Format(time.RFC3339),
 		UptimeSeconds: snap.UptimeSeconds,
 		Timestamp:     time.Now().UTC().Format(time.RFC3339),
-		Events: &eventCountsBlock{
+		Events: eventCountsBlock{
 			Lifetime:   snap.Lifetime,
 			LastMinute: snap.LastMinute,
 			LastHour:   snap.LastHour,

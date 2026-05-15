@@ -348,6 +348,28 @@ func TestPublishHeartbeatEmpty(t *testing.T) {
 	}
 }
 
+// Regression: uptime_seconds must always be present in the heartbeat payload,
+// even when its value is zero. omitempty would silently drop the field — see
+// https://github.com/sweeney/asterisk-mqtt/pull/2#discussion_r3246602779
+func TestHeartbeatUptimeZeroIsEmitted(t *testing.T) {
+	// Marshal the payload directly with a zero UptimeSeconds and assert the
+	// key is in the raw JSON, not just present at decode time.
+	payload := heartbeatPayload{State: "online"}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(data), `"uptime_seconds":0`) {
+		t.Errorf("expected uptime_seconds:0 in payload, got %s", data)
+	}
+	if !strings.Contains(string(data), `"started_at":""`) {
+		t.Errorf("expected started_at to be present (even as empty string), got %s", data)
+	}
+	if !strings.Contains(string(data), `"timestamp":""`) {
+		t.Errorf("expected timestamp to be present (even as empty string), got %s", data)
+	}
+}
+
 // --- helpers ---
 
 func assertTopicSuffix(t *testing.T, topic, suffix string) {
