@@ -197,6 +197,56 @@ heartbeat:
   interval: 30s
   topic: ""
 `, "heartbeat.topic is required when heartbeat.interval > 0"},
+		{"bare positive integer interval is rejected", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 60
+`, `parsing config: duration must be 0 (to disable) or a duration string like "30s"; got bare integer 60 which would be interpreted as 60 nanoseconds`},
+		{"sub-second interval is rejected", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 500ms
+`, "heartbeat.interval must be at least 1s when non-zero, got 500ms"},
+		{"topic_prefix with wildcard", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk/#"
+`, `mqtt.topic_prefix must not contain MQTT wildcards (+ or #): "asterisk/#"`},
+		{"topic_prefix with reserved prefix", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "$SYS/foo"
+`, `mqtt.topic_prefix must not begin with '$' (reserved by MQTT brokers): "$SYS/foo"`},
+		{"topic_prefix with whitespace", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk pbx"
+`, `mqtt.topic_prefix must not contain whitespace or control characters: "asterisk pbx"`},
+		{"topic_prefix with trailing slash", `
+ami:
+  username: admin
+  secret: s3cret
+mqtt:
+  topic_prefix: "asterisk/"
+`, `mqtt.topic_prefix must not have a leading or trailing '/': "asterisk/"`},
+		{"heartbeat.topic with wildcard", `
+ami:
+  username: admin
+  secret: s3cret
+heartbeat:
+  interval: 30s
+  topic: "status/+"
+`, `heartbeat.topic must not contain MQTT wildcards (+ or #): "status/+"`},
 	}
 
 	for _, tt := range tests {

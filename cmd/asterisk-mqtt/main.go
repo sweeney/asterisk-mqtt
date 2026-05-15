@@ -50,11 +50,10 @@ func main() {
 	}
 
 	statusTopic := ""
-	offlineBytes := []byte(`{"state":"offline"}`)
 	if cfg.Heartbeat.Interval > 0 {
 		statusTopic = fmt.Sprintf("%s/%s", cfg.MQTT.TopicPrefix, cfg.Heartbeat.Topic)
 		mqttOpts.WillTopic = statusTopic
-		mqttOpts.WillPayload = offlineBytes
+		mqttOpts.WillPayload = offlineStatusBytes
 	}
 
 	pub, err := publisher.NewMQTTPublisher(mqttOpts)
@@ -67,44 +66,54 @@ func main() {
 
 	s := stats.New()
 
-	var hbWg sync.WaitGroup
+	var hbShutdown func()
 	if statusTopic != "" {
-		// Publish an initial "online" status immediately so subscribers see
-		// state without waiting a full interval, and start the periodic loop.
-		if err := publishHeartbeat(ctx, pub, statusTopic, s); err != nil {
-			log.Printf("initial heartbeat publish error: %v", err)
-		}
-		hbWg.Add(1)
-		go func() {
-			defer hbWg.Done()
-			heartbeatLoop(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
-		}()
+		hbShutdown = startHeartbeat(ctx, pub, statusTopic, cfg.Heartbeat.Interval.Duration(), s)
 	}
 
 	if err := run(ctx, cfg, pub, s); err != nil && ctx.Err() == nil {
 		log.Fatalf("error: %v", err)
 	}
 
-	// Wait for the heartbeat goroutine to fully drain so its in-flight
-	// "online" publish cannot land after the final "offline" we publish
-	// below. Paho preserves FIFO order on the wire, so once the goroutine
-	// has returned, any next publish we queue is guaranteed to be last.
-	hbWg.Wait()
-
-	// Clean shutdown: replace the retained "online" payload with "offline"
-	// so subscribers don't see stale state after we exit. On crash, the
-	// broker delivers the LWT instead; either way the retained payload
-	// reflects reality.
-	if statusTopic != "" {
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-		if err := pub.PublishRetained(shutdownCtx, statusTopic, offlineBytes); err != nil {
-			log.Printf("publishing offline status: %v", err)
-		}
+	if hbShutdown != nil {
+		hbShutdown()
 	}
 
 	log.Println("shutdown complete")
 }
+
+// startHeartbeat publishes an initial "online" status, starts the periodic
+// loop, and returns a shutdown function. The shutdown waits for the goroutine
+// to drain (so no in-flight "online" can land after the final "offline") and
+// then publishes the retained "offline" payload itself.
+func startHeartbeat(ctx context.Context, pub publisher.Publisher, topic string, interval time.Duration, s *stats.Stats) func() {
+	if err := publishHeartbeat(ctx, pub, topic, s); err != nil {
+		log.Printf("initial heartbeat publish error: %v", err)
+	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		heartbeatLoop(ctx, pub, topic, interval, s)
+	}()
+	return func() {
+		// Wait for the heartbeat goroutine to fully drain. Paho preserves
+		// FIFO order on the wire, so once the goroutine has returned any
+		// next publish we queue is guaranteed to be last.
+		wg.Wait()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		if err := pub.PublishRetained(shutdownCtx, topic, offlineStatusBytes); err != nil {
+			log.Printf("publishing offline status: %v", err)
+		}
+	}
+}
+
+// offlineStatusBytes is the canonical retained payload published to the
+// status topic when the daemon stops cleanly, and the broker's LWT payload
+// when it stops abruptly. Kept as a package-level literal so tests can match
+// it byte-for-byte.
+var offlineStatusBytes = []byte(`{"state":"offline"}`)
 
 func run(ctx context.Context, cfg *config.Config, pub publisher.Publisher, s *stats.Stats) error {
 	for {
@@ -284,7 +293,7 @@ func publishHeartbeat(ctx context.Context, pub publisher.Publisher, topic string
 		State:         "online",
 		StartedAt:     snap.StartedAt.UTC().Format(time.RFC3339),
 		UptimeSeconds: snap.UptimeSeconds,
-		Timestamp:     time.Now().UTC().Format(time.RFC3339),
+		Timestamp:     snap.Now.UTC().Format(time.RFC3339),
 		Events: eventCountsBlock{
 			Lifetime:   snap.Lifetime,
 			LastMinute: snap.LastMinute,

@@ -7,12 +7,19 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sweeney/asterisk-mqtt/internal/ami"
 	"github.com/sweeney/asterisk-mqtt/internal/correlator"
 	"github.com/sweeney/asterisk-mqtt/internal/publisher"
 	"github.com/sweeney/asterisk-mqtt/internal/stats"
 )
+
+// fixedClock returns a stats.Clock pinned to t for deterministic uptime and
+// timestamp assertions in heartbeat tests.
+func fixedClock(t time.Time) stats.Clock {
+	return func() time.Time { return t }
+}
 
 func fixturesDir() string {
 	return filepath.Join("..", "..", "testdata", "fixtures")
@@ -280,7 +287,8 @@ func TestPayloadCommonShape(t *testing.T) {
 
 func TestPublishHeartbeatPayload(t *testing.T) {
 	mock := publisher.NewMockPublisher()
-	s := stats.New()
+	clk := time.Date(2026, 5, 14, 12, 0, 0, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
 	s.Record("ringing")
 	s.Record("answered")
 	s.Record("hungup")
@@ -326,7 +334,8 @@ func TestPublishHeartbeatPayload(t *testing.T) {
 
 func TestPublishHeartbeatEmpty(t *testing.T) {
 	mock := publisher.NewMockPublisher()
-	s := stats.New()
+	clk := time.Date(2026, 5, 14, 12, 0, 0, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
 
 	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
 		t.Fatalf("publishHeartbeat: %v", err)
@@ -345,6 +354,85 @@ func TestPublishHeartbeatEmpty(t *testing.T) {
 	lifetime := events["lifetime"].(map[string]any)
 	if len(lifetime) != 0 {
 		t.Errorf("expected empty lifetime map, got %v", lifetime)
+	}
+}
+
+// TestPublishHeartbeatTimestampMatchesStatsClock pins down the fix for the
+// clock-mixing review comment: the wall clock in `timestamp` must come from
+// the same source as `uptime_seconds`, not a separate time.Now().
+func TestPublishHeartbeatTimestampMatchesStatsClock(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	clk := time.Date(2026, 5, 14, 12, 34, 56, 0, time.UTC)
+	s := stats.NewWithClock(fixedClock(clk))
+
+	if err := publishHeartbeat(context.Background(), mock, "asterisk/status", s); err != nil {
+		t.Fatalf("publishHeartbeat: %v", err)
+	}
+
+	p := parsePayload(t, mock.Messages()[0].Payload)
+	want := clk.Format(time.RFC3339)
+	if p["timestamp"] != want {
+		t.Errorf("expected timestamp=%q (from stats clock), got %v", want, p["timestamp"])
+	}
+}
+
+// TestStartHeartbeatShutdownOrdering verifies the full lifecycle: an initial
+// "online" goes out immediately, ticks add more "online" messages, and after
+// ctx is cancelled the shutdown function publishes exactly one trailing
+// retained "offline" — guaranteed last by the WaitGroup drain.
+func TestStartHeartbeatShutdownOrdering(t *testing.T) {
+	mock := publisher.NewMockPublisher()
+	s := stats.New()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Short ticker so we definitely see at least one mid-loop publish before
+	// shutdown, but well above the 1s config minimum (that minimum guards
+	// operator typos, not test-only behaviour).
+	shutdown := startHeartbeat(ctx, mock, "asterisk/status", 5*time.Millisecond, s)
+
+	time.Sleep(30 * time.Millisecond)
+	cancel()
+	shutdown()
+
+	msgs := mock.Messages()
+	if len(msgs) < 2 {
+		t.Fatalf("expected at least 2 messages (initial online + final offline), got %d", len(msgs))
+	}
+
+	// Every message except the last is an "online" heartbeat to the right
+	// topic, retained.
+	for i, m := range msgs[:len(msgs)-1] {
+		if m.Topic != "asterisk/status" {
+			t.Errorf("msg %d: wrong topic %q", i, m.Topic)
+		}
+		if !m.Retained {
+			t.Errorf("msg %d: must be retained", i)
+		}
+		p := parsePayload(t, m.Payload)
+		if p["state"] != "online" {
+			t.Errorf("msg %d: expected state=online, got %v", i, p["state"])
+		}
+	}
+
+	last := msgs[len(msgs)-1]
+	if last.Topic != "asterisk/status" {
+		t.Errorf("final message topic %q != asterisk/status", last.Topic)
+	}
+	if !last.Retained {
+		t.Errorf("final offline message must be retained")
+	}
+	if string(last.Payload) != `{"state":"offline"}` {
+		t.Errorf("final payload %q != %q", last.Payload, `{"state":"offline"}`)
+	}
+}
+
+// TestOfflineStatusBytesUsedAsLWT pins the package-level offline literal so
+// the LWT wired into MQTTOptions matches the clean-shutdown publish byte for
+// byte. (A drift between the two would mean a subscriber distinguishing
+// crash vs. clean exit by payload would silently break.)
+func TestOfflineStatusBytesUsedAsLWT(t *testing.T) {
+	if string(offlineStatusBytes) != `{"state":"offline"}` {
+		t.Errorf("offlineStatusBytes drifted: %s", offlineStatusBytes)
 	}
 }
 

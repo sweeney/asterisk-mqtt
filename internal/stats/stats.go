@@ -8,10 +8,7 @@ import (
 	"time"
 )
 
-const (
-	bucketCount    = 24 * 60 // 1440 one-minute buckets = 24 hours
-	bucketDuration = time.Minute
-)
+const bucketCount = 24 * 60 // 1440 one-minute buckets = 24 hours
 
 type bucket struct {
 	minute int64
@@ -64,8 +61,12 @@ func (s *Stats) Record(event string) {
 	s.lifetime[event]++
 }
 
-// Snapshot is a point-in-time view of the recorded stats.
+// Snapshot is a point-in-time view of the recorded stats. Now is the moment
+// the snapshot was taken according to the same clock that drives Uptime and
+// the rolling windows — heartbeat callers should use it for their own
+// timestamp field so wall-clock and uptime stay coherent.
 type Snapshot struct {
+	Now           time.Time         `json:"-"`
 	StartedAt     time.Time         `json:"started_at"`
 	UptimeSeconds float64           `json:"uptime_seconds"`
 	Lifetime      map[string]uint64 `json:"lifetime"`
@@ -84,6 +85,7 @@ func (s *Stats) Snapshot() Snapshot {
 	nowMinute := now.Unix() / 60
 
 	return Snapshot{
+		Now:           now,
 		StartedAt:     s.started,
 		UptimeSeconds: now.Sub(s.started).Seconds(),
 		Lifetime:      copyCounts(s.lifetime),
